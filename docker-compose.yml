@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: smart-ims-web
+    ports:
+      - "8085:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - DB_HOST=db
+      - DB_NAME=ims_db
+      - DB_USER=ims_user
+      - DB_PASS=ims_password
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mysql:8.0
+    container_name: smart-ims-db
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_DATABASE=ims_db
+      - MYSQL_USER=ims_user
+      - MYSQL_PASSWORD=ims_password
+      - MYSQL_ROOT_PASSWORD=root_password
+    volumes:
+      # 重点：这里使用 db_data 命名卷，Docker 会自动在系统内部创建空间
+      # 不再映射到 /volume1/.../mysql_data，从而避免报错
+      - db_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+volumes:
+  db_data:

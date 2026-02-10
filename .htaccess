@@ -1,0 +1,24 @@
+
+# 强制所有 .ts 和 .tsx 文件返回正确的 MIME 类型
+<FilesMatch "\.(ts|tsx)$">
+    ForceType application/javascript
+</FilesMatch>
+
+# 确保 api.php 被 PHP 处理器捕获
+<Files "api.php">
+    SetHandler application/x-httpd-php
+</Files>
+
+<IfModule mod_mime.c>
+    AddType application/javascript .ts
+    AddType application/javascript .tsx
+    AddType application/x-httpd-php .php
+</IfModule>
+
+# 禁用缓存以解决 Session 状态同步延迟
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+</IfModule>
